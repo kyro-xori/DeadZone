@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title> DeadZone</title>
+
+    <style>
+        body {
+            background-color: #18251c;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        .game-window {
+            background-color: #2b3d30;
+            width: 600px;
+            margin: 50px auto;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #64a60d;
+        }
+
+        h1 {
+            color: #a8d18d;
+            font-size: 36px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 24px;
+        }
+
+        .stat {
+            background-color: #2b3d30;
+            min-width: 120px;
+            padding: 12px;
+            border: 1px solid #64a60d;
+            border-radius: 10px;
+        }
+
+        .stat h2 {
+            margin: 8px 0 0;
+        }
+
+        #start-button {
+            display: none;
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 6px;
+            background-color: #64a60d;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #skip-button {
+            display: none;
+            margin-top: 12px;
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 6px;
+            background-color: #5f7a61;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        #survival-screen {
+            display: none;
+            margin-top: 24px;
+            background-color: #3a4d3c;
+            border: 1px solid #64a60d;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        #actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 16px 0;
+        }
+
+        #actions button {
+            padding: 10px 14px;
+            border: 0;
+            border-radius: 6px;
+            background-color: #64a60d;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        #status-message {
+            margin-top: 10px;
+            color: #dfeec2;
+            font-weight: bold;
+        }
+
+        @media (max-width: 680px) {
+            .game-window {
+                box-sizing: border-box;
+                width: calc(100% - 32px);
+                margin: 24px auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="game-window">
+        <h1>🧟 DeadZone</h1>
+        <p id="story">Survive the DeadZone for 30 days.</p>
+        <button id="start-button" type="button">Start game</button>
+        <button id="skip-button" type="button">Skip Story ⏩</button>
+    </div>
+
+    <div id="survival-screen">
+        <h2>🧟 Survival Status</h2>
+        <p>You are safe for now, but the DeadZone is still watching.</p>
+        <div id="story-event" style="display: none;">
+            <h2>Expedition</h2>
+            <p id="story-text"></p>
+            <button id="adopt-dog" type="button">🐕 Adopt the dog</button>
+            <button id="leave-dog" type="button">🚶 Leave the dog</button>
+            <button id="continue-button" type="button" style="display: none;">Continue</button>
+        </div>
+        <div id="actions">
+            <button id="search-food" type="button">🔎 Search for Food</button>
+            <button type="button">🪵 Collect Materials</button>
+            <button id="rest-button" type="button">💤 Rest</button>
+        </div>
+
+        <p id="status-message">Choose an action to survive the night.</p>
+
+        <div class="stats">
+            <div class="stat">
+                ❤️ Health
+                <h2>100 / 100</h2>
+            </div>
+            <div class="stat">
+                <p id="dog-status">🐕 Companion: None</p>
+                <p id="dog-hunger" style="display: none;">🍖 Dog is happy!</p>
+                <button id="feed-dog" type="button" style="display: none;">🍖 Feed Dog (1 Food)</button>
+            </div>
+            <div class="stat">
+                🍖 Food
+                <h2 id="food-count">5</h2>
+            </div>
+            <div class="stat">
+                🪵 Materials
+                <h2>0</h2>
+            </div>
+            <div class="stat">
+                📅 Day
+                <h2 id="day-count">1 / 30</h2>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const storyText = `The world is about to end...
+
+Scientists have had an outbreak in their lab, and a zombie apocalypse has begun!
+
+The government sends out an emergency warning: "Find shelter immediately. Stay away from infected areas."
+
+You look outside and see people running through the streets. Sirens are blaring, and chaos is everywhere.
+
+Suddenly, you hear a loud crash downstairs. The zombies have found your house!
+
+QUICK! YOU NEED TO GET OUT!
+
+You grab your supplies and escape through the back door. After running for what feels like hours, you find an abandoned shelter far away from the city.
+
+You lock the door behind you. For now, you're safe.
+
+But your food is limited, your supplies are running low, and rescue might not come for 30 days.`;
+
+        const storyElement = document.getElementById("story");
+        const startButton = document.getElementById("start-button");
+        const skipButton = document.getElementById("skip-button");
+        const survivalScreen = document.getElementById("survival-screen");
+        const statusMessage = document.getElementById("status-message");
+        const searchFoodButton = document.getElementById("search-food");
+        const foodCount = document.getElementById("food-count");
+        const storyEvent = document.getElementById("story-event");
+        const eventText = document.getElementById("story-text");
+        const adoptDogButton = document.getElementById("adopt-dog");
+        const leaveDogButton = document.getElementById("leave-dog");
+        const continueButton = document.getElementById("continue-button");
+        const dogStatus = document.getElementById("dog-status");
+        const dogHunger = document.getElementById("dog-hunger");
+        const feedDogButton = document.getElementById("feed-dog");
+
+        let letter = 0;
+        let typingTimer = null;
+        let food = 5;
+        let day = 1;
+        let expeditionDone = false;
+        let hasDog = false;
+
+        function typeStory() {
+            if (letter < storyText.length) {
+                storyElement.textContent += storyText[letter];
+                letter++;
+                typingTimer = setTimeout(typeStory, 45);
+            } else {
+                skipButton.style.display = "none";
+                startButton.style.display = "inline-block";
+            }
+        }
+
+        function finishStory() {
+            if (typingTimer !== null) {
+                clearTimeout(typingTimer);
+            }
+            storyElement.textContent = storyText;
+            skipButton.style.display = "none";
+            startButton.style.display = "inline-block";
+        }
+
+        function updateFoodDisplay() {
+            foodCount.textContent = String(food);
+        }
+
+        storyElement.textContent = "";
+        startButton.style.display = "none";
+        skipButton.style.display = "inline-block";
+        typeStory();
+
+        skipButton.addEventListener("click", finishStory);
+
+        startButton.addEventListener("click", function () {
+            storyElement.style.display = "none";
+            startButton.style.display = "none";
+            survivalScreen.style.display = "block";
+        });
+
+        searchFoodButton.addEventListener("click", function () {
+            if (expeditionDone) {
+                statusMessage.textContent = "You have already completed this expedition.";
+                return;
+            }
+
+            expeditionDone = true;
+            const foundFood = Math.floor(Math.random() * 3) + 1;
+            food += foundFood;
+            updateFoodDisplay();
+            statusMessage.textContent = "You found " + foundFood + " food.";
+            eventText.textContent = "You search an abandoned store and find " + foundFood
+                + " food. A hungry dog is hiding behind a shelf. Keeping it will require extra food. Will you adopt it?";
+            storyEvent.style.display = "block";
+            searchFoodButton.disabled = true;
+        });
+
+        adoptDogButton.addEventListener("click", function () {
+            hasDog = true;
+            dogStatus.textContent = "🐕 Companion: Dog";
+            dogHunger.style.display = "block";
+            feedDogButton.style.display = "inline-block";
+            eventText.textContent = "You adopted the dog! You now have a companion, but it will need extra food each day.";
+            adoptDogButton.style.display = "none";
+            leaveDogButton.style.display = "none";
+            continueButton.style.display = "inline-block";
+        });
+
+        feedDogButton.addEventListener("click", function () {
+            if (!hasDog) {
+                return;
+            }
+
+            if (food < 1) {
+                dogHunger.textContent = "🍖 You don't have enough food to feed the dog.";
+                return;
+            }
+
+            food--;
+            updateFoodDisplay();
+            dogHunger.textContent = "🍖 Dog is happy!";
+        });
+
+        leaveDogButton.addEventListener("click", function () {
+            eventText.textContent = "You leave the dog behind and return to the shelter with your supplies.";
+            adoptDogButton.style.display = "none";
+            leaveDogButton.style.display = "none";
+            continueButton.style.display = "inline-block";
+        });
+
+        continueButton.addEventListener("click", function () {
+            storyEvent.style.display = "none";
+            statusMessage.textContent = hasDog
+                ? "You returned to the shelter with food and your new companion."
+                : "You returned to the shelter with the food you found.";
+        });
+
+        document.getElementById("rest-button").addEventListener("click",function(){
+            if (day >= 30) {
+                alert("you've reached Day 30! Rescue has arrived!");
+                return;
+            }
+            if (food < 2){
+                alert("You need at least 2 food to rest!");
+                return;
+            }
+            
+            food = food -2;
+            document.getElementById("food-count").textContent = food;
+
+            day=day + 1;
+            document.getElementById("day-count").textContent = day + "/ 30";
+
+            alert("You rested and used 2 food. It is now day"+ day +"!");
+        });
+    </script>
+</body>
+</html>
