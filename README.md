@@ -5,3 +5,5 @@ The steps I took to make it
 3. then I added a story line and also tried making it more intresting
 
 I am not done yet so I will work on it this week unless it gets rejected 
+I spent 13h working on the game and it took me a while to make it I am proud of it
+and hope you guys like it!
