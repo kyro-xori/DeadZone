@@ -1,1 +1,7 @@
-I tried making a zombie survival game but it is not that good and i have to work on it a lot more
+I tried making a zombie survival game but it is not that good 
+The steps I took to make it 
+1. I made the Gui work and found out how to make buttons
+2. I added id's to the button for it to have a function
+3. then I added a story line and also tried making it more intresting
+
+I am not done yet so I will work on it this week unless it gets rejected 
