@@ -1,2 +1,4 @@
 I tried making a zombie survival game but it is not that good The steps I took to make it 1. I made the Gui work and found out how to make buttons 2. I added ids to the button for it to have a function 3. then I added a story line and also tried making it more intresting I am not done yet so I will work on it this week unless it gets rejected I spent 13h working on the game and it took me a while to make it I am proud of it although it was really hard to make so I hope you guys like it!
  THANK YOU SO MUCH FOR LOOKING AT IT!!
+
+All you have to do to play the game is just read and click buttons
